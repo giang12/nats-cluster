@@ -1,0 +1,60 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+
+IMAGE = 'nats'
+IPCli = 4222
+ManPort = 8222
+ClusterPort = 6222
+
+# default cluster size is 3.
+cluster_size = ARGV.empty? ? 3 : ARGV[0].to_i
+
+# get Host IP
+if `uname`.strip == 'Darwin'
+  HOST_IP = `ipconfig getifaddr en0 || ipconfig getifaddr en1`.strip
+else
+  interface=`route -n | grep '^0.0.0.0'`.split("\n")[0].split(" ")[-1]
+  HOST_IP = `ip -4 addr show scope global dev #{interface} | grep inet`.split(" ")[1][0..-4]
+end
+
+puts "Host IP used for Kafka Brokers is #{HOST_IP}"
+
+# making compose file
+COMPOSE = {
+  'version' => '2',
+ # 'networks' => { 'nats_cluster' => { 'driver' => 'overlay' } },
+  'services' => {}
+}
+
+routes = ""
+
+def add_broker(id, routes)
+  name = "nats-#{id}"
+
+  COMPOSE['services'][name] = {
+    'image' => IMAGE,
+    'hostname' => name,
+    'restart' => 'always',
+ #   'networks' => [ 'nats_cluster' ],
+    'ports' => [
+        "#{IPCli + id}:4222",
+        "#{ClusterPort + id}:6222",
+        "#{ManPort + id}:8222"
+      ],
+    'environment' => {
+      'cluster' => 'nats://0.0.0.0:6222',
+      'routes' => routes,
+    }
+  }
+
+end
+
+(0..cluster_size - 1).each do |i|
+  add_broker(i, routes)
+  routes += "nats://#{HOST_IP}:#{ClusterPort + i} "
+end
+
+File.write('nats-compose.yml', COMPOSE.to_yaml)
+
+puts COMPOSE.to_yaml

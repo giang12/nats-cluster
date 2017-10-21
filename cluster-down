@@ -1,0 +1,4 @@
+#!/bin/bash
+
+docker-compose -f nats-compose.yml --project-name nats stop
+docker-compose -f nats-compose.yml --project-name nats rm -f
