@@ -1,5 +1,8 @@
 # Docker Nats Cluster
 
+Creates a [Docker](https://www.docker.com)-based [nats](https://nats.io/)
+cluster with [docker-compose](https://docs.docker.com/compose)
+
 ## Prerequisites
 
 Works for Linux and Mac (with the latest Docker for Mac), and uses docker
