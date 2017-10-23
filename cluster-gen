@@ -18,7 +18,7 @@ else
   HOST_IP = `ip -4 addr show scope global dev #{interface} | grep inet`.split(" ")[1][0..-4]
 end
 
-puts "Host IP used for Kafka Brokers is #{HOST_IP}"
+puts "Host IP used is #{HOST_IP}"
 
 # making compose file
 COMPOSE = {
