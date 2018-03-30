@@ -23,7 +23,7 @@ puts "Host IP used is #{HOST_IP}"
 # making compose file
 COMPOSE = {
   'version' => '2',
- # 'networks' => { 'nats_cluster' => { 'driver' => 'overlay' } },
+  'networks' => { 'cluster' => { 'driver' => 'overlay' } },
   'services' => {}
 }
 
@@ -36,7 +36,7 @@ def add_broker(id, routes)
     'image' => IMAGE,
     'hostname' => name,
     'restart' => 'always',
- #   'networks' => [ 'nats_cluster' ],
+    'networks' => [ 'cluster' ],
     'ports' => [
         "#{IPCli + id}:4222",
         "#{ClusterPort + id}:6222",
