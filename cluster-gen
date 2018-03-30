@@ -23,7 +23,7 @@ puts "Host IP used is #{HOST_IP}"
 # making compose file
 COMPOSE = {
   'version' => '2',
-  'networks' => { 'cluster' => { 'driver' => 'overlay' } },
+  'networks' => { 'cluster' => { 'driver' => 'bridge' } },
   'services' => {}
 }
 
