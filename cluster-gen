@@ -3,9 +3,9 @@
 require 'yaml'
 
 IMAGE = 'nats'
-IPCli = 4222
-ManPort = 8222
-ClusterPort = 6222
+IPCli = 4221
+ClusterPort = 6221
+ManPort = 8221
 
 # default cluster size is 3.
 cluster_size = ARGV.empty? ? 3 : ARGV[0].to_i
@@ -22,15 +22,12 @@ puts "Host IP used is #{HOST_IP}"
 
 # making compose file
 COMPOSE = {
-  'version' => '2',
-  'networks' => { 'cluster' => { 'driver' => 'bridge' } },
+  'version' => '3',
+  'networks' => { 'cluster' => { 'driver' => 'overlay' } },
   'services' => {}
 }
 
-routes = ""
-
-def add_broker(id, routes)
-  name = "nats-#{id}"
+def add_broker(id, name, routes)
 
   COMPOSE['services'][name] = {
     'image' => IMAGE,
@@ -42,17 +39,26 @@ def add_broker(id, routes)
         "#{ClusterPort + id}:6222",
         "#{ManPort + id}:8222"
       ],
-    'environment' => {
-      'cluster' => 'nats://0.0.0.0:6222',
-      'routes' => routes,
-    }
+    'command' => [
+      "-DV",
+      "-p",
+      "4222",
+      "-m",
+      "8222",
+      "-cluster",
+      "nats://0.0.0.0:6222",
+      "-routes",
+      "#{routes}"
+    ]
   }
-
 end
 
-(0..cluster_size - 1).each do |i|
-  add_broker(i, routes)
-  routes += "nats://#{HOST_IP}:#{ClusterPort + i} "
+cluster_routes = ""
+
+(1..cluster_size).each do |i|
+  name = "nat_#{i}"
+  add_broker(i, name, cluster_routes)
+  cluster_routes += (cluster_routes == "" ? "" : ", ") + "nats://#{name}:6222"
 end
 
 File.write('nats-compose.yml', COMPOSE.to_yaml)
