@@ -6,11 +6,11 @@ cluster with [docker-compose](https://docs.docker.com/compose)
 ## Prerequisites
 
 Works for Linux and Mac (with the latest Docker for Mac), and uses docker
-compose file syntax version 2.
+compose file syntax version >=3.
 
-- [Docker](https://www.docker.com) 1.10.0 or later
-- [Docker Compose](https://docs.docker.com/compose) 1.6.0 or later
-- [Ruby](https://www.ruby-lang.org)
+-   [Docker](https://www.docker.com) 1.10.0 or later
+-   [Docker Compose](https://docs.docker.com/compose) 1.6.0 or later
+-   [Ruby](https://www.ruby-lang.org)
 
 ## In the Box
 
