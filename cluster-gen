@@ -1,24 +1,35 @@
 #!/usr/bin/env ruby
 
+require 'optparse'
+#require 'ostruct'
 require 'yaml'
 
+#Default params
 IMAGE = 'nats'
 IPCli = 4221
 ClusterPort = 6221
 ManPort = 8221
-
+ConfigPath = nil
 # default cluster size is 3.
-cluster_size = ARGV.empty? ? 3 : ARGV[0].to_i
+cluster_size = 3
+
+#parse args
+#options = OpenStruct.new
+OptionParser.new do |opt|
+  opt.on('-i', '--image nats', 'docker image') { |o| IMAGE = o.to_s }
+  opt.on('-s', '--cluster_size 3', 'cluster size') { |o| cluster_size = o.to_i }
+  opt.on('-c', '--config /etc/nat.cfg', 'config path') { |o| ConfigPath = o.to_s }
+end.parse!
 
 # get Host IP
-if `uname`.strip == 'Darwin'
-  HOST_IP = `ipconfig getifaddr en0 || ipconfig getifaddr en1`.strip
-else
-  interface=`route -n | grep '^0.0.0.0'`.split("\n")[0].split(" ")[-1]
-  HOST_IP = `ip -4 addr show scope global dev #{interface} | grep inet`.split(" ")[1][0..-4]
-end
+# if `uname`.strip == 'Darwin'
+#   HOST_IP = `ipconfig getifaddr en0 || ipconfig getifaddr en1`.strip
+# else
+#   interface=`route -n | grep '^0.0.0.0'`.split("\n")[0].split(" ")[-1]
+#   HOST_IP = `ip -4 addr show scope global dev #{interface} | grep inet`.split(" ")[1][0..-4]
+# end
 
-puts "Host IP used is #{HOST_IP}"
+# puts "Host IP used is #{HOST_IP}"
 
 # making compose file
 COMPOSE = {
@@ -48,9 +59,24 @@ def add_broker(id, name, routes)
       "-cluster",
       "nats://0.0.0.0:6222",
       "-routes",
-      "#{routes}"
-    ]
+      "#{routes}",
+    ],
+    'deploy' => {
+      'placement'=> {
+        'constraints' => ['node.labels.server_type == nat']
+      }
+    }
   }
+
+  if(ConfigPath != nil)
+    COMPOSE['services'][name]['volumes'] = []
+
+    COMPOSE['services'][name]['volumes'].push("#{ConfigPath}:/etc/nat.cfg")
+    # specify config location
+    COMPOSE['services'][name]['command'].push("-c")
+    COMPOSE['services'][name]['command'].push("/etc/nat.cfg")
+
+  end
 end
 
 cluster_routes = ""
