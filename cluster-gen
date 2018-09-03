@@ -18,7 +18,7 @@ cluster_size = 3
 OptionParser.new do |opt|
   opt.on('-i', '--image nats', 'docker image') { |o| IMAGE = o.to_s }
   opt.on('-s', '--cluster_size 3', 'cluster size') { |o| cluster_size = o.to_i }
-  opt.on('-c', '--config /etc/nat.cfg', 'config path') { |o| ConfigPath = o.to_s }
+  opt.on('-c', '--config /etc/nats.cfg', 'config path') { |o| ConfigPath = o.to_s }
 end.parse!
 
 # get Host IP
@@ -60,21 +60,21 @@ def add_broker(id, name, routes)
       "nats://0.0.0.0:6222",
       "-routes",
       "#{routes}",
-    ],
-    'deploy' => {
-      'placement'=> {
-        'constraints' => ['node.labels.server_type == nat']
-      }
-    }
+    ]
+    # 'deploy' => {
+    #   'placement'=> {
+    #     'constraints' => ['node.labels.server_type == nats']
+    #   }
+    # }
   }
 
   if(ConfigPath != nil)
     COMPOSE['services'][name]['volumes'] = []
 
-    COMPOSE['services'][name]['volumes'].push("#{ConfigPath}:/etc/nat.cfg")
+    COMPOSE['services'][name]['volumes'].push("#{ConfigPath}:/etc/nats.cfg")
     # specify config location
     COMPOSE['services'][name]['command'].push("-c")
-    COMPOSE['services'][name]['command'].push("/etc/nat.cfg")
+    COMPOSE['services'][name]['command'].push("/etc/nats.cfg")
 
   end
 end

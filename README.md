@@ -25,9 +25,9 @@ Ports exposed
 ## Running
 
 Usage: cluster-gen [options]
-    -i, --image nats                 docker image
-    -s, --cluster_size 3             cluster size
-    -c, --config /etc/nat.cfg        config path
+-i, --image nats docker image
+-s, --cluster_size 3 cluster size
+-c, --config /etc/nats.cfg config path
 
 Bring up the cluster and specify that you want e.g. five brokers (the default
 cluster size is three brokers) with
