@@ -25,7 +25,7 @@ Ports exposed
 ## Running
 
 Usage: cluster-gen [options]
--i, --image nats docker image
+-i, --image nats specify nats image
 -s, --cluster_size 3 cluster size
 -c, --config /etc/nats.cfg config path
 
@@ -33,18 +33,23 @@ Bring up the cluster and specify that you want e.g. five brokers (the default
 cluster size is three brokers) with
 
 ```
-./cluster-gen 5
+./cluster-gen -s 5
 ./cluster-up
 ```
 
-This will create a `nats-compose.yml` file in the directory that will be used
+This will create a `nats-compose.yml` file in `PWD` that will be used
 by `./cluster-down` do delete the cluster (i.e. this stops and removes all data).
 If you do not want to delete data, use the `docker-compose` commands directly.
 
 # Important
 
-The containers will only run on nodes with label `server_type=nat`
+The containers will only run on nodes with label `server_type=nats`
 From a docker manager node, you can specify the nodes to run nats on by running
-`docker node update --label-add server_type=nat {{target_node_id}}`
+`docker node update --label-add server_type=nats {{target_node_id}}`
 
-Make sure the config file is available at specify path set by `-c` on every nats nodes if used
+# Configuration
+
+By default `nats.cfg` will be encrypted and installed, in each nats containers
+
+!!!Edit the file to make changes or point to the desired configuration file with option
+`./cluster-gen -c nats/config.cfg`
