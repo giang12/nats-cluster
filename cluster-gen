@@ -6,7 +6,7 @@ require 'yaml'
 
 #Default params
 IMAGE = 'nats'
-ConfigPath = File.expand_path(File.dirname(File.dirname(__FILE__))) + '/' + 'nats.cfg'
+ConfigPath = File.expand_path(File.dirname(__FILE__)) + '/' + 'nats.cfg'
 cluster_size = 3
 
 IPCli = 4221
