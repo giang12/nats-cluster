@@ -64,7 +64,14 @@ def add_broker(id, name, routes)
       "nats://0.0.0.0:6222",
       "-routes",
       "#{routes}",
-    ]
+    ],
+    'logging' => {
+      'driver' => "json-file",
+      'options' => {
+        'max-size' => "512m",
+        'max-file' => "3"
+      }
+    },
     # 'deploy' => {
     #   'placement'=> {
     #     'constraints' => ['node.labels.server_type == nats']
